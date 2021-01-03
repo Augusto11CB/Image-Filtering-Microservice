@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+// import { config } from './config/config';
 
 (async () => {
 
@@ -9,6 +10,9 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   // Set the network port
   const port = process.env.PORT || 8082;
+
+  // Set the access to the config file
+  // const cfg = config;
   
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
@@ -28,6 +32,23 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+
+  app.get( "/filteredimage", async ( req, res ) => {
+    let { image_url } = req.query;
+
+    // let apiKey = req.header("X-API-Key");
+
+    // if(!apiKey || apiKey != cfg.api_key ){
+    //   return res.status(401).send({ auth: false, message: 'Invalid api key.' });
+    // }
+
+    if (!image_url) {
+      return res.status(422).send({ auth: true, message: 'image_url is required.' });
+    }
+
+    let filteredPath = await filterImageFromURL(image_url);
+    res.status(200).sendFile(filteredPath, () => { deleteLocalFiles([filteredPath]); });
+  } );
 
   //! END @TODO1
   
