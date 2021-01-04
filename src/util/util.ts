@@ -43,7 +43,9 @@ export async function deleteLocalFiles(files: Array<string>) {
 export async function generateJWT(payload: string | object | Buffer): Promise<string> {
     // Use jwt to create a new JWT Payload containing
     
-    const token = jwt.sign(payload, config.jwt.secret);   
+    const secret = `${config.jwt.secret || config.jwt['secret-dev']}`;
+    
+    const token = jwt.sign(payload, secret);   
 
     return token;
 }
