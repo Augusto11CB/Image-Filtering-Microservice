@@ -2,6 +2,11 @@
 
 ## Project Setup
 
+### Elastic Beanstalk Endpoint
+```
+http://image-filtering-microservice.sa-east-1.elasticbeanstalk.com/
+```
+
 ### Environment Variable
 In order to implement the extra requirement "Authentication", a secret was introduced to be used to generate the JWT.
 
