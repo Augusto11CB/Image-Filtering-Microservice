@@ -17,7 +17,19 @@ import { requireAuth } from './auth/auth';
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
-  // @HERE1 IMPLEMENT A RESTFUL ENDPOINT
+  // Root Endpoint
+  // Displays a simple message to the user
+  app.get("/", async (req, res) => {
+    res.send("try GET /filteredimage?image_url={{}}")
+  });
+
+  // Generates a token based on client IP address
+  app.get("/token", async (req, res) => {
+    const token = await generateJWT(`${req.connection.remoteAddress || req.connection.localAddress}${new Date().getDate()}`);
+    res.status(200).send({ success: true, token });
+  });
+
+    // @HERE1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
   // IT SHOULD
@@ -34,30 +46,18 @@ import { requireAuth } from './auth/auth';
   /**************************************************************************** */
 
   app.get("/filteredimage", requireAuth, async (req, res) => {
-    let { image_url } = req.query; 
+    let imageUrl = req.query; 
     
-    if (!image_url) {
-      return res.status(422).send({ auth: true, message: 'image_url is required.' });
+    if (!imageUrl) {
+      return res.status(422).send({ auth: true, message: 'image url is required.' });
     }
 
-    let filteredPath = await filterImageFromURL(image_url);
+    let filteredPath = await filterImageFromURL(imageUrl);
+    
     res.status(200).sendFile(filteredPath, () => { deleteLocalFiles([filteredPath]); });
   });
 
   //! END @HERE1
-
-  // Root Endpoint
-  // Displays a simple message to the user
-  app.get("/", async (req, res) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  });
-
-
-  // Generates a token based on client IP address
-  app.get("/token", async (req, res) => {
-    const token = await generateJWT(`${req.connection.remoteAddress || req.connection.localAddress}${new Date().getDate()}`);
-    res.status(200).send({ success: true, token });
-  });
 
   // Start the Server
   app.listen(port, () => {
