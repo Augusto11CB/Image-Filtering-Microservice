@@ -1,5 +1,30 @@
 # Udagram Image Filtering Microservice
 
+## Project Setup
+
+### Environment Variable
+In order to implement the extra requirement "Authentication", a secret was introduced to be used to generate the JWT.
+
+This secret has a default value called `secret-dev` and it is located in `src/config/config.ts`. The PRD secret is defined as `secret` and it is stored as an environment variable. The application accesses this value through NodeJS.process in the file `src/config/config.ts`.
+
+### Get JWT to Filter Image
+In order to use the endpoint `http://{{HOST}}/filteredimage`, it is necessary to generate a JWT token previously. To do so, first you need to send a `GET` request to the endpoint `http://{{HOST}}/token`. It will return a payload similar to: 
+
+```
+{
+    "success": true,
+    "token": "eyJhbGciOiJIUzI1NiJ9.OjpmZmZmOjEyNy4wLjAuMTQ.iQ25D35QiNhyZG6YvbIeHTZlhVYX23J_4PeLp6DEY-E"
+}
+```
+
+Once you receive the payload, copy the value of the attribute "token" and use it as the Bearer Token on the endpoint `http://{{HOST}}/filteredimage`.
+
+The JSON of a Postman collection that holds these endpoints and configuration is present at the root of project and its name is `cloud-cdnd-c2-final.postman_collection.json`. 
+
+![](resources/GET_TOKEN_POSTMAN.png)
+![](resources/FILTERED_IMAGE_POSTMAN.png)
+
+## Udagram Overview
 Udagram is a simple cloud application developed alongside the Udacity Cloud Engineering Nanodegree. It allows users to register and log into a web client, post photos to the feed, and process photos using an image filtering microservice.
 
 The project is split into three parts:

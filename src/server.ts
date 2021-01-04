@@ -1,6 +1,10 @@
+require('dotenv').config();
+
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import * as jwt from 'jsonwebtoken';
+import { filterImageFromURL, deleteLocalFiles, generateJWT } from './util/util';
+import { requireAuth } from './auth/auth';
 
 (async () => {
 
@@ -9,11 +13,11 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   // Set the network port
   const port = process.env.PORT || 8082;
-  
+
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
-  // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
+  // @HERE1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
   // IT SHOULD
@@ -29,18 +33,35 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   /**************************************************************************** */
 
-  //! END @TODO1
-  
+  app.get("/filteredimage", requireAuth, async (req, res) => {
+    let { image_url } = req.query; 
+    
+    if (!image_url) {
+      return res.status(422).send({ auth: true, message: 'image_url is required.' });
+    }
+
+    let filteredPath = await filterImageFromURL(image_url);
+    res.status(200).sendFile(filteredPath, () => { deleteLocalFiles([filteredPath]); });
+  });
+
+  //! END @HERE1
+
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get("/", async (req, res) => {
     res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  });
+
+
+  // Generates a token based on client IP address
+  app.get("/token", async (req, res) => {
+    const token = await generateJWT(`${req.connection.remoteAddress || req.connection.localAddress}${new Date().getDate()}`);
+    res.status(200).send({ success: true, token });
+  });
 
   // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+  app.listen(port, () => {
+    console.log(`server running http://localhost:${port}`);
+    console.log(`press CTRL+C to stop server`);
+  });
 })();
