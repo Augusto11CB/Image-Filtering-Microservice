@@ -25,11 +25,11 @@ import { requireAuth } from './auth/auth';
 
   // Generates a token based on client IP address
   app.get("/token", async (req, res) => {
-    const token = await generateJWT(`${req.connection.remoteAddress || req.connection.localAddress}${new Date().getDate()}`);
+    const token: string = await generateJWT(`${req.connection.remoteAddress || req.connection.localAddress}${new Date().getDate()}`);
     res.status(200).send({ success: true, token });
   });
 
-    // @HERE1 IMPLEMENT A RESTFUL ENDPOINT
+  // @HERE1 IMPLEMENT A RESTFUL ENDPOINT
   // GET /filteredimage?image_url={{URL}}
   // endpoint to filter an image from a public url.
   // IT SHOULD
@@ -46,13 +46,13 @@ import { requireAuth } from './auth/auth';
   /**************************************************************************** */
 
   app.get("/filteredimage", requireAuth, async (req, res) => {
-    let imageUrl = req.query; 
+    let imageUrl: string = req.query.image_url;
     
     if (!imageUrl) {
       return res.status(422).send({ auth: true, message: 'image url is required.' });
     }
 
-    let filteredPath = await filterImageFromURL(imageUrl);
+    let filteredPath : string = await filterImageFromURL(imageUrl);
     
     res.status(200).sendFile(filteredPath, () => { deleteLocalFiles([filteredPath]); });
   });

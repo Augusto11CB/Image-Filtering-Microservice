@@ -15,14 +15,14 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 
     // Bearer X4YZA89UIS4UQJKX4YZA89UIS4UQJK
     // Splitting in the ' ' and verifying if there is part one and two and only it
-    const token_bearer = req.headers.authorization.split(' ');
+    const token_bearer : string[] = req.headers.authorization.split(' ');
     if(token_bearer.length != 2){
         return res.status(401).send({ message: 'Malformed token.' });
     }
 
-    const token = token_bearer[1];
+    const token:string = token_bearer[1];
 
-    const secret = `${config.jwt.secret || config.jwt['secret-dev']}`;
+    const secret:string = `${config.jwt.secret || config.jwt['secret-dev']}`;
 
     return jwt.verify(token, secret, (err, decoded) => {
       if (err) {
